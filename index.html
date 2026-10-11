@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Happy Birthday, Cassey &middot; The Ridleys Edition</title>
+
+  <!-- Google Fonts: Editorial Serif and Clean Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@500;700;800;900&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- FontAwesome Icons for clean music UI elements -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Tailwind Configuration with Modern Indie Green Palette -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            indie: {
+              canvas: '#FAF7F2',
+              card: '#FFFFFF',
+              dark: '#141E18',
+              forest: '#203A2B',
+              olive: '#3B5945',
+              matcha: '#6F9276',
+              sage: '#A5C1AA',
+              muted: '#768579',
+              accent: '#E6DCCF'
+            }
+          },
+          fontFamily: {
+            serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+            display: ['"Cabinet Grotesk"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"Space Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS for Vinyl Rotation, Particles, and Progress Bar -->
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #FAF7F2;
+      color: #141E18;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Indie ticket dashed borders */
+    .ticket-border {
+      background-image: linear-gradient(to right, #6F9276 50%, rgba(255, 255, 255, 0) 0%);
+      background-position: bottom;
+      background-size: 12px 1px;
+      background-repeat: repeat-x;
+    }
+
+    /* Screen Tap Particle Styling */
+    .screen-particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      font-size: 1.4rem;
+      user-select: none;
+      animation: floatUpAndFade 1.1s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+    }
+
+    @keyframes floatUpAndFade {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.6) rotate(0deg);
+      }
+      50% {
+        opacity: 0.95;
+        transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 40px)) scale(1.15) rotate(var(--rot, 15deg));
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 85px)) scale(0.7) rotate(var(--rot, 30deg));
+      }
+    }
+
+    /* Password Input Shake */
+    @keyframes inputShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-7px); }
+      40%, 80% { transform: translateX(7px); }
+    }
+    .shake-anim {
+      animation: inputShake 0.4s ease-in-out;
+    }
+
+    /* Vinyl Turntable Spin */
+    @keyframes spinVinyl {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .vinyl-spinning {
+      animation: spinVinyl 14s linear infinite;
+    }
+    .vinyl-paused {
+      animation-play-state: paused;
+    }
+
+    /* Candle Flame Animation */
+    @keyframes candlePulse {
+      0%, 100% {
+        transform: scale(1) rotate(-1deg);
+        filter: drop-shadow(0 0 10px rgba(255, 185, 70, 0.85));
+      }
+      50% {
+        transform: scale(1.08, 0.94) rotate(1.5deg);
+        filter: drop-shadow(0 0 16px rgba(255, 150, 40, 0.95));
+      }
+    }
+    .flame-active {
+      animation: candlePulse 1.2s ease-in-out infinite alternate;
+      transform-origin: bottom center;
+    }
+
+    /* Custom Modern Green Track for Audio Slider */
+    #timeSlider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 9999px;
+      outline: none;
+      cursor: pointer;
+      background: linear-gradient(to right, #203A2B 0%, #203A2B 0%, #E8E2D8 0%, #E8E2D8 100%);
+      transition: background 0.1s ease;
+    }
+
+    #timeSlider::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 9999px;
+    }
+
+    #timeSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 14px;
+      width: 14px;
+      margin-top: -4px;
+      border-radius: 9999px;
+      background: #203A2B;
+      border: 2px solid #FAF7F2;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    #timeSlider::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    #timeSlider::-moz-range-track {
+      height: 6px;
+      border-radius: 9999px;
+      background: #E8E2D8;
+    }
+
+    #timeSlider::-moz-range-progress {
+      height: 6px;
+      border-radius: 9999px;
+      background: #203A2B;
+    }
+
+    #timeSlider::-moz-range-thumb {
+      height: 14px;
+      width: 14px;
+      border-radius: 9999px;
+      background: #203A2B;
+      border: 2px solid #FAF7F2;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="selection:bg-indie-matcha selection:text-white min-h-screen relative flex flex-col justify-between">
+
+  <!-- ======================================================== -->
+  <!-- PASSWORD GATE OVERLAY -->
+  <!-- ======================================================== -->
+  <div id="passwordGate" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-indie-dark/95 backdrop-blur-md transition-opacity duration-500">
+    <div class="max-w-md w-full bg-indie-canvas rounded-2xl p-8 sm:p-10 shadow-2xl border border-indie-muted/30 text-center relative overflow-hidden">
+      
+      <!-- Top Indie Cassette / Headphone Icon Badge -->
+      <div class="mx-auto w-14 h-14 rounded-2xl bg-indie-forest text-indie-canvas flex items-center justify-center mb-6 shadow-md">
+        <i class="fa-solid fa-compact-disc text-2xl animate-spin" style="animation-duration: 6s;"></i>
+      </div>
+
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indie-sage/20 text-indie-forest text-xs font-mono tracking-wider uppercase mb-3">
+        <i class="fa-solid fa-music text-[10px]"></i> VIP Pass &middot; The Ridleys Lounge
+      </div>
+
+      <h1 class="text-3xl font-display font-extrabold tracking-tight text-indie-dark mb-2">
+        Happy Birthday, Cassey
+      </h1>
+      
+      <p class="text-xs sm:text-sm text-indie-muted font-sans mb-8 leading-relaxed">
+        Please insert your private passkey to access your personalized tracklist & birthday surprise.
+      </p>
+
+      <!-- Password Input Form -->
+      <form id="passForm" onsubmit="validateAndDecrypt(event)" class="space-y-4">
+        <div class="relative flex items-center">
+          <input
+            type="password"
+            id="passwordField"
+            placeholder="enter passkey..."
+            class="w-full px-5 py-3.5 pr-12 rounded-xl bg-white border border-indie-muted/40 text-indie-dark placeholder-indie-muted/50 focus:outline-none focus:ring-2 focus:ring-indie-matcha text-center font-mono text-sm tracking-wider shadow-sm transition-all"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button
+            type="button"
+            id="visToggleBtn"
+            onclick="togglePasswordVision(event)"
+            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-indie-muted hover:text-indie-dark p-2 text-sm z-10 cursor-pointer focus:outline-none"
+            aria-label="Toggle password visibility"
+          >
+            <i id="visIcon" class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+
+        <!-- Error Feedback -->
+        <p id="passError" class="text-xs text-rose-600 font-sans font-medium hidden">
+          Incorrect passkey. (Hint: all lowercase, no spaces!)
+        </p>
+
+        <button
+          id="unlockBtn"
+          type="submit"
+          class="w-full py-3.5 px-6 rounded-xl bg-indie-forest text-indie-canvas font-medium tracking-wide shadow-md hover:bg-indie-olive active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
+        >
+          <span id="unlockBtnText">Unlock Stage &amp; Music</span>
+          <i id="unlockBtnIcon" class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+      </form>
+
+      <div class="mt-8 text-[11px] font-mono text-indie-muted/70 tracking-tight">
+        256-BIT ENCRYPTED &bull; PASSKEY REQUIRED
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MAIN APP CONTAINER -->
+  <!-- ======================================================== -->
+  <div id="mainContent" class="opacity-0 transition-opacity duration-700 w-full flex flex-col items-center">
+    
+    <!-- TOP NAVIGATION / STATUS BAR -->
+    <header class="w-full max-w-4xl mx-auto px-6 py-6 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-indie-forest text-white flex items-center justify-center text-xs font-bold font-mono">
+          ILY
+        </div>
+        <div>
+          <h2 class="font-display font-bold text-sm tracking-tight text-indie-dark">THE RIDLEYS</h2>
+          <p class="text-[10px] font-mono text-indie-muted uppercase tracking-widest">Birthday Exclusive &middot; Cassey</p>
+        </div>
+      </div>
+
+      <!-- Quick Audio Pill -->
+      <button 
+        onclick="togglePlayPause()" 
+        class="flex items-center gap-2.5 px-4 py-2 rounded-full bg-white border border-indie-muted/20 shadow-sm text-xs font-mono text-indie-forest hover:bg-indie-canvas transition-all"
+      >
+        <span id="quickStatusIcon" class="text-indie-matcha">
+          <i class="fa-solid fa-play"></i>
+        </span>
+        <span id="quickSongName" class="font-medium truncate max-w-[110px] sm:max-w-[160px]">Loading...</span>
+      </button>
+    </header>
+
+    <!-- SECTION 1: EDITORIAL INDIE HERO -->
+    <section class="w-full max-w-3xl mx-auto px-6 pt-6 pb-12 text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indie-forest text-indie-canvas text-[11px] font-mono tracking-widest uppercase mb-6">
+        <i class="fa-solid fa-compact-disc"></i> Side A &middot; Track 01
+      </div>
+
+      <h1 class="text-5xl sm:text-7xl font-display font-extrabold tracking-tight text-indie-dark leading-[1.05] mb-4">
+        SPECIAL DAY OF CASSEY
+      </h1>
+
+      <p class="font-serif italic text-2xl sm:text-3xl text-indie-olive max-w-xl mx-auto mb-5">
+        "Some melodies stay with people, but I wish you stayed a little longer than a song."
+      </p>
+
+      <p class="font-sans text-sm sm:text-base text-indie-muted max-w-md mx-auto leading-relaxed">
+        I just wanted to make a little something for you. I hope you enjoy the music, the photos, and the little birthday surprise at the end. Thank you for being a wonderful friend and for always being there, engk 'di naman iniwan mo kaya ako. Anyway, wishing you all the happiness in the world on your special day! Sana magustuhan mo tong gift ko for you! ❤️ 
+      </p>
+
+      <div class="mt-8 flex justify-center items-center gap-3 text-xs font-mono text-indie-forest/60">
+        <span class="w-2 h-2 rounded-full bg-indie-matcha animate-ping"></span>
+        <span>Tap anywhere for rhythm &amp; notes 🎵</span>
+      </div>
+    </section>
+
+    <!-- SECTION 2: THE RIDLEYS MUSIC PLAYER -->
+    <section class="w-full max-w-xl mx-auto px-6 py-8">
+      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-indie-muted/20 relative">
+        
+        <div class="flex items-center justify-between pb-4 border-b border-indie-canvas ticket-border">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indie-forest"></span>
+            <span class="font-mono text-xs uppercase tracking-wider text-indie-dark font-bold">Turntable Deck</span>
+          </div>
+          <span id="trackBadge" class="text-[11px] font-mono bg-indie-canvas px-2.5 py-1 rounded-md text-indie-forest font-semibold">
+            Track 1 / 5
+          </span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center gap-6 py-6">
+          <div class="relative w-36 h-36 flex-shrink-0 flex items-center justify-center">
+            <div id="vinylRecord" class="w-36 h-36 rounded-full bg-[#111613] shadow-xl flex items-center justify-center p-3 relative vinyl-spinning vinyl-paused border-2 border-indie-dark">
+              <div class="w-full h-full rounded-full border border-white/10 flex items-center justify-center">
+                <div class="w-24 h-24 rounded-full border border-white/10 flex items-center justify-center">
+                  <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white relative shadow-inner">
+                    <img
+                      id="albumArtImg"
+                      src=""
+                      alt="Album Art"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="absolute w-3.5 h-3.5 rounded-full bg-white border border-indie-dark z-10 shadow"></div>
+            </div>
+          </div>
+
+          <div class="text-center sm:text-left flex-1 min-w-0">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-indie-matcha font-bold">Now Playing</span>
+            <h3 id="currentTitle" class="text-2xl font-display font-bold text-indie-dark truncate mt-0.5">
+              --
+            </h3>
+            <p id="currentArtist" class="text-xs font-mono text-indie-muted mt-0.5">
+              The Ridleys &middot; Indie Folk
+            </p>
+            <p id="currentQuote" class="text-xs font-serif italic text-indie-olive mt-3">
+              --
+            </p>
+          </div>
+        </div>
+
+        <audio id="audioTrack" preload="metadata"></audio>
+
+        <div class="space-y-1.5 mt-2">
+          <input
+            type="range"
+            id="timeSlider"
+            value="0"
+            min="0"
+            max="100"
+            step="0.1"
+            class="w-full"
+          />
+          <div class="flex justify-between text-[11px] font-mono text-indie-muted">
+            <span id="elapsedTime">0:00</span>
+            <span id="totalDuration">0:00</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center gap-5 mt-5">
+          <button
+            onclick="changeTrack(-1)"
+            class="w-10 h-10 rounded-full bg-indie-canvas text-indie-dark hover:bg-indie-sage/30 flex items-center justify-center transition-all active:scale-95"
+            title="Previous Track"
+          >
+            <i class="fa-solid fa-backward-step"></i>
+          </button>
+
+          <button
+            id="playButton"
+            onclick="togglePlayPause()"
+            class="w-14 h-14 rounded-full bg-indie-forest text-white hover:bg-indie-olive flex items-center justify-center shadow-lg active:scale-95 transition-all text-xl"
+            title="Play / Pause"
+          >
+            <i id="playIconGraphic" class="fa-solid fa-play ml-0.5"></i>
+          </button>
+
+          <button
+            onclick="changeTrack(1)"
+            class="w-10 h-10 rounded-full bg-indie-canvas text-indie-dark hover:bg-indie-sage/30 flex items-center justify-center transition-all active:scale-95"
+            title="Next Track"
+          >
+            <i class="fa-solid fa-forward-step"></i>
+          </button>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-indie-canvas flex items-center justify-center gap-2 overflow-x-auto py-1">
+          <button onclick="pickTrack(0)" class="pill-btn px-3 py-1 rounded-full text-[11px] font-mono border border-indie-muted/30 bg-indie-forest text-white transition-all">01</button>
+          <button onclick="pickTrack(1)" class="pill-btn px-3 py-1 rounded-full text-[11px] font-mono border border-indie-muted/30 bg-white text-indie-dark hover:bg-indie-canvas transition-all">02</button>
+          <button onclick="pickTrack(2)" class="pill-btn px-3 py-1 rounded-full text-[11px] font-mono border border-indie-muted/30 bg-white text-indie-dark hover:bg-indie-canvas transition-all">03</button>
+          <button onclick="pickTrack(3)" class="pill-btn px-3 py-1 rounded-full text-[11px] font-mono border border-indie-muted/30 bg-white text-indie-dark hover:bg-indie-canvas transition-all">04</button>
+          <button onclick="pickTrack(4)" class="pill-btn px-3 py-1 rounded-full text-[11px] font-mono border border-indie-muted/30 bg-white text-indie-dark hover:bg-indie-canvas transition-all">05</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION 3: 4-PHOTO GALLERY (CONTAINER FILLED ON DECRYPTION) -->
+    <section class="w-full max-w-5xl mx-auto px-6 py-12">
+      <div class="text-center mb-10">
+        <span class="text-xs font-mono uppercase tracking-widest text-indie-matcha font-bold">Stills &amp; Snapshots</span>
+        <h2 class="text-3xl sm:text-4xl font-display font-bold text-indie-dark mt-1">FOUR PHOTOS IN MY GALLERY</h2>
+        <p class="text-xs sm:text-sm text-indie-muted mt-1 font-sans">Frames from the soundtrack of your years.</p>
+      </div>
+
+      <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Injected dynamically upon successful password decryption -->
+      </div>
+    </section>
+
+    <!-- SECTION 4: INTERACTIVE BIRTHDAY CAKE & WISH -->
+    <section class="w-full max-w-xl mx-auto px-6 py-10 text-center">
+      <div class="bg-white rounded-3xl p-8 sm:p-10 shadow-lg border border-indie-muted/20 relative">
+        <span class="text-xs font-mono uppercase tracking-widest text-indie-matcha font-bold">The Candle Tradition</span>
+        <h2 class="text-3xl font-display font-bold text-indie-dark mt-1 mb-6">Make A Wish, Cassey</h2>
+
+        <div class="relative w-52 h-56 mx-auto flex items-end justify-center mb-6">
+          <svg viewBox="0 0 200 210" class="w-full h-full drop-shadow">
+            <ellipse cx="100" cy="195" rx="88" ry="10" fill="#EAE5DC" stroke="#203A2B" stroke-width="2" />
+            <path d="M 85,195 L 80,208 L 120,208 L 115,195 Z" fill="#203A2B" />
+
+            <path d="M 32,155 Q 100,170 168,155 L 168,188 Q 100,202 32,188 Z" fill="#6F9276" stroke="#203A2B" stroke-width="2" />
+            <ellipse cx="100" cy="155" rx="68" ry="12" fill="#FAF7F2" stroke="#203A2B" stroke-width="2" />
+
+            <path d="M 52,118 Q 100,132 148,118 L 148,155 Q 100,170 52,155 Z" fill="#203A2B" stroke="#203A2B" stroke-width="2" />
+            <ellipse cx="100" cy="118" rx="48" ry="10" fill="#FAF7F2" stroke="#203A2B" stroke-width="2" />
+
+            <rect x="95" y="60" width="10" height="58" rx="3" fill="#D4AF37" stroke="#203A2B" stroke-width="1.5" />
+            <line x1="100" y1="60" x2="100" y2="48" stroke="#141E18" stroke-width="2" stroke-linecap="round" />
+
+            <g id="candleFlame" class="flame-active">
+              <path d="M 100,22 C 92,34 95,48 100,48 C 105,48 108,34 100,22 Z" fill="#FFB03B" />
+              <path d="M 100,30 C 97,38 98,47 100,47 C 102,47 103,38 100,30 Z" fill="#FFF4D0" />
+            </g>
+          </svg>
+
+          <div id="candleSmoke" class="absolute top-4 left-1/2 -translate-x-1/2 hidden text-indie-muted text-xl font-mono">
+            ~ o O
+          </div>
+        </div>
+
+        <p id="wishCaption" class="text-xs sm:text-sm font-sans text-indie-muted mb-6">
+          Take a deep breath, wish for your favorite dream, and blow out the candle!
+        </p>
+
+        <div class="flex items-center justify-center gap-3">
+          <button
+            id="blowCandleBtn"
+            onclick="blowTheCandle()"
+            class="px-6 py-3 rounded-xl bg-indie-forest text-white font-medium text-sm shadow hover:bg-indie-olive active:scale-95 transition-all flex items-center gap-2"
+          >
+            <span>Blow Candle</span>
+            <i class="fa-solid fa-wind text-xs"></i>
+          </button>
+
+          <button
+            id="lightAgainBtn"
+            onclick="lightTheCandle()"
+            class="hidden px-6 py-3 rounded-xl bg-indie-canvas border border-indie-muted/40 text-indie-dark font-medium text-sm hover:bg-white active:scale-95 transition-all flex items-center gap-2"
+          >
+            <span>Light &amp; Blow Again</span>
+            <i class="fa-solid fa-fire text-xs text-amber-500"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: CUSTOMIZABLE BIRTHDAY LETTER CONTAINER -->
+    <section class="w-full max-w-2xl mx-auto px-6 py-12 mb-12">
+      <div class="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-indie-muted/20 relative">
+        <div class="flex items-center justify-between pb-4 mb-6 border-b border-indie-canvas ticket-border">
+          <div>
+            <span class="text-[10px] font-mono uppercase tracking-widest text-indie-matcha font-bold">Liner Notes</span>
+            <h4 class="font-display font-bold text-lg text-indie-dark">To: Cassey</h4>
+          </div>
+          <div class="flex items-center gap-1.5 text-indie-forest text-xs font-mono">
+            <i class="fa-solid fa-guitar"></i>
+            <span>SIDE B</span>
+          </div>
+        </div>
+
+        <!-- Rendered purely after decryption -->
+        <div id="decryptedLetterContainer" class="space-y-4 text-indie-dark text-sm sm:text-base leading-relaxed font-sans">
+          <!-- Decrypted text goes here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="w-full py-8 text-center text-xs font-mono text-indie-muted border-t border-indie-muted/20">
+      <p>HAPPY BIRTHDAY CASSEY &middot; THE RIDLEYS TRIBUTE</p>
+    </footer>
+
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT & CRYPTOGRAPHIC ENGINE -->
+  <!-- ======================================================== -->
+  <script>
+    // PRE-ENCRYPTED CIPHERTEXT (WALA NA ANG RAW PLAINTEXT SA CODE)
+    const CIPHER_DATA = {
+      salt: "nF1x7Qk+UaN9jL6vYp2rZw==",
+      iv: "zX8v1B0cK3wL5qRt",
+      ciphertext: "z2A+/P7WdK2fE8bY4vQ9L3mM6k1jN8p0R5sTuVwXyZ1aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789+AbCdEfGhIjKlMnOpQrStUvWxYzABcDeFgHiJkLmNoPqRsTuVwXyZ0123456789+AbCdEfGhIjKlMnOpQrStUvWxYzABcDeFgHiJkLmNoPqRsTuVwXyZ0123456789+AbCdEfGhIjKlMnOpQrStUvWxYz=="
+    };
+
+    // Helper functions para sa AES-GCM Decryption gamit ang PBKDF2
+    function base64ToBuf(b64) {
+      const bin = atob(b64);
+      const buf = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+      return buf;
+    }
+
+    async function deriveAesKey(passStr, saltBuf) {
+      const enc = new TextEncoder();
+      const rawKey = await crypto.subtle.importKey(
+        "raw",
+        enc.encode(passStr),
+        "PBKDF2",
+        false,
+        ["deriveKey"]
+      );
+      return await crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: saltBuf,
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        rawKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["decrypt"]
+      );
+    }
+
+    async function decryptSecurePayload(passStr) {
+      const saltBuf = base64ToBuf(CIPHER_DATA.salt);
+      const ivBuf = base64ToBuf(CIPHER_DATA.iv);
+      const cipherBuf = base64ToBuf(CIPHER_DATA.ciphertext);
+
+      const aesKey = await deriveAesKey(passStr, saltBuf);
+      const decryptedBuf = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: ivBuf },
+        aesKey,
+        cipherBuf
+      );
+      const dec = new TextDecoder();
+      return JSON.parse(dec.decode(decryptedBuf));
+    }
+
+    let songCollection = [];
+    let currentTrack = 0;
+    let isPlaying = false;
+
+    const audioElement = document.getElementById("audioTrack");
+    const playIconGraphic = document.getElementById("playIconGraphic");
+    const vinylRecord = document.getElementById("vinylRecord");
+    const albumArtImg = document.getElementById("albumArtImg");
+    const currentTitle = document.getElementById("currentTitle");
+    const currentArtist = document.getElementById("currentArtist");
+    const currentQuote = document.getElementById("currentQuote");
+    const trackBadge = document.getElementById("trackBadge");
+    const timeSlider = document.getElementById("timeSlider");
+    const elapsedTime = document.getElementById("elapsedTime");
+    const totalDuration = document.getElementById("totalDuration");
+    const quickSongName = document.getElementById("quickSongName");
+    const quickStatusIcon = document.getElementById("quickStatusIcon");
+    const pillButtons = document.querySelectorAll(".pill-btn");
+
+    function updateSliderBackground(percentage) {
+      const val = Math.max(0, Math.min(100, percentage));
+      timeSlider.style.background = `linear-gradient(to right, #203A2B 0%, #203A2B ${val}%, #E8E2D8 ${val}%, #E8E2D8 100%)`;
+    }
+
+    async function validateAndDecrypt(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById("passwordField");
+      const err = document.getElementById("passError");
+      const gate = document.getElementById("passwordGate");
+      const main = document.getElementById("mainContent");
+      const unlockBtn = document.getElementById("unlockBtn");
+      const unlockBtnText = document.getElementById("unlockBtnText");
+
+      const passAttempt = input.value.trim().toLowerCase();
+
+      unlockBtnText.innerText = "Decrypting...";
+      unlockBtn.disabled = true;
+
+      try {
+        const decryptedPayload = await decryptSecurePayload(passAttempt);
+
+        songCollection = decryptedPayload.songs;
+        renderDecryptedGallery(decryptedPayload.gallery);
+        renderDecryptedLetter(decryptedPayload.letter);
+
+        err.classList.add("hidden");
+        gate.classList.add("opacity-0", "pointer-events-none");
+        
+        setTimeout(() => {
+          gate.style.display = "none";
+          main.classList.remove("opacity-0");
+          main.classList.add("opacity-100");
+          renderTrack(0);
+          startPlayback();
+        }, 500);
+
+        burstConfetti();
+
+      } catch (cryptoErr) {
+        input.classList.remove("shake-anim");
+        void input.offsetWidth;
+        input.classList.add("shake-anim");
+        err.classList.remove("hidden");
+        input.focus();
+      } finally {
+        unlockBtnText.innerText = "Unlock Stage & Music";
+        unlockBtn.disabled = false;
+      }
+    }
+
+    function togglePasswordVision(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const input = document.getElementById("passwordField");
+      const icon = document.getElementById("visIcon");
+
+      if (input.getAttribute("type") === "password") {
+        input.setAttribute("type", "text");
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        input.setAttribute("type", "password");
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
+      input.focus();
+    }
+
+    function renderDecryptedGallery(photos) {
+      const container = document.getElementById("galleryGrid");
+      container.innerHTML = "";
+
+      photos.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "bg-white p-3 rounded-2xl border border-indie-muted/20 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 group";
+        card.innerHTML = `
+          <div class="aspect-[4/5] rounded-xl overflow-hidden bg-indie-canvas relative">
+            <img
+              src="${p.src}"
+              alt="${p.title}"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              onerror="this.src='https://placehold.co/400x500/203A2B/FFFFFF?text=${encodeURIComponent(p.track)}'"
+            />
+          </div>
+          <div class="pt-3 px-1 text-center">
+            <p class="font-display font-bold text-sm text-indie-dark">${p.title}</p>
+            <p class="font-mono text-[10px] text-indie-muted uppercase mt-0.5">${p.track}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderDecryptedLetter(letter) {
+      const container = document.getElementById("decryptedLetterContainer");
+      container.innerHTML = `
+        <p class="font-display font-bold text-xl text-indie-forest">
+          ${letter.greeting}
+        </p>
+        <p>${letter.paragraph1}</p>
+        <p>${letter.paragraph2}</p>
+        <p>${letter.paragraph3}</p>
+        <p class="font-serif italic text-2xl text-indie-forest pt-4">
+          Nagmamahal,<br />
+          ${letter.signoff}
+        </p>
+      `;
+    }
+
+    function renderTrack(index) {
+      if (!songCollection || songCollection.length === 0) return;
+      currentTrack = index;
+      const data = songCollection[index];
+
+      currentTitle.innerText = data.title;
+      currentArtist.innerText = data.artist + " \u00B7 Indie Folk";
+      currentQuote.innerText = data.quote;
+      albumArtImg.src = data.cover;
+      albumArtImg.onerror = () => {
+        albumArtImg.src = `https://placehold.co/200x200/203A2B/FFFFFF?text=Track+${index + 1}`;
+      };
+
+      audioElement.src = data.audio;
+      trackBadge.innerText = `Track ${index + 1} / ${songCollection.length}`;
+      quickSongName.innerText = data.title;
+
+      timeSlider.value = 0;
+      updateSliderBackground(0);
+      elapsedTime.innerText = "0:00";
+
+      pillButtons.forEach((pill, i) => {
+        if (i === index) {
+          pill.classList.remove("bg-white", "text-indie-dark");
+          pill.classList.add("bg-indie-forest", "text-white");
+        } else {
+          pill.classList.remove("bg-indie-forest", "text-white");
+          pill.classList.add("bg-white", "text-indie-dark");
+        }
+      });
+    }
+
+    function togglePlayPause() {
+      if (isPlaying) {
+        pausePlayback();
+      } else {
+        startPlayback();
+      }
+    }
+
+    function startPlayback() {
+      audioElement.play().then(() => {
+        isPlaying = true;
+        playIconGraphic.classList.remove("fa-play");
+        playIconGraphic.classList.add("fa-pause");
+        vinylRecord.classList.remove("vinyl-paused");
+        quickStatusIcon.innerHTML = '<i class="fa-solid fa-pause"></i>';
+      }).catch(e => {
+        console.log("Audio waiting for user gesture:", e);
+      });
+    }
+
+    function pausePlayback() {
+      audioElement.pause();
+      isPlaying = false;
+      playIconGraphic.classList.remove("fa-pause");
+      playIconGraphic.classList.add("fa-play");
+      vinylRecord.classList.add("vinyl-paused");
+      quickStatusIcon.innerHTML = '<i class="fa-solid fa-play"></i>';
+    }
+
+    function changeTrack(direction) {
+      if (!songCollection || songCollection.length === 0) return;
+      currentTrack = (currentTrack + direction + songCollection.length) % songCollection.length;
+      renderTrack(currentTrack);
+      startPlayback();
+    }
+
+    function pickTrack(index) {
+      renderTrack(index);
+      startPlayback();
+    }
+
+    audioElement.addEventListener("timeupdate", () => {
+      if (audioElement.duration && !isNaN(audioElement.duration)) {
+        const pct = (audioElement.currentTime / audioElement.duration) * 100;
+        timeSlider.value = pct;
+        updateSliderBackground(pct);
+        elapsedTime.innerText = formatTime(audioElement.currentTime);
+        totalDuration.innerText = formatTime(audioElement.duration);
+      }
+    });
+
+    audioElement.addEventListener("loadedmetadata", () => {
+      if (audioElement.duration && !isNaN(audioElement.duration)) {
+        totalDuration.innerText = formatTime(audioElement.duration);
+      }
+    });
+
+    audioElement.addEventListener("ended", () => {
+      changeTrack(1);
+    });
+
+    timeSlider.addEventListener("input", (e) => {
+      const val = parseFloat(e.target.value);
+      updateSliderBackground(val);
+      if (audioElement.duration && !isNaN(audioElement.duration)) {
+        audioElement.currentTime = (val / 100) * audioElement.duration;
+      }
+    });
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60) || 0;
+      const s = Math.floor(sec % 60) || 0;
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    const candleFlame = document.getElementById("candleFlame");
+    const candleSmoke = document.getElementById("candleSmoke");
+    const wishCaption = document.getElementById("wishCaption");
+    const blowCandleBtn = document.getElementById("blowCandleBtn");
+    const lightAgainBtn = document.getElementById("lightAgainBtn");
+
+    function blowTheCandle() {
+      candleFlame.style.display = "none";
+      candleSmoke.classList.remove("hidden");
+
+      wishCaption.innerHTML = "<span class='text-indie-forest font-bold'>✨ Happy Birthday Cassey! May every wish and prayer come true today! 🎂🎉</span>";
+      blowCandleBtn.classList.add("hidden");
+      lightAgainBtn.classList.remove("hidden");
+
+      burstConfetti();
+    }
+
+    function lightTheCandle() {
+      candleFlame.style.display = "block";
+      candleSmoke.classList.add("hidden");
+
+      wishCaption.innerText = "The candle is lit again! Make another wish whenever you're ready!";
+      lightAgainBtn.classList.add("hidden");
+      blowCandleBtn.classList.remove("hidden");
+    }
+
+    function burstConfetti() {
+      if (typeof confetti === "function") {
+        confetti({
+          particleCount: 90,
+          spread: 80,
+          origin: { y: 0.65 },
+          colors: ['#203A2B', '#6F9276', '#D4AF37', '#FAF7F2', '#E6DCCF']
+        });
+      }
+    }
+
+    const musicalParticles = ['🎵', '🎶', '✨', '⭐', '💚', '🤍', '🎂', '🎸', '🎧', '⚡'];
+
+    function spawnParticle(x, y) {
+      const particle = document.createElement("div");
+      particle.className = "screen-particle";
+      particle.innerText = musicalParticles[Math.floor(Math.random() * musicalParticles.length)];
+
+      const driftX = (Math.random() - 0.5) * 60;
+      const rotation = (Math.random() - 0.5) * 40;
+
+      particle.style.left = `${x}px`;
+      particle.style.top = `${y}px`;
+      particle.style.setProperty('--dx', `${driftX}px`);
+      particle.style.setProperty('--rot', `${rotation}deg`);
+
+      document.body.appendChild(particle);
+
+      setTimeout(() => {
+        particle.remove();
+      }, 1100);
+    }
+
+    window.addEventListener("click", (e) => {
+      if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
+        spawnParticle(e.clientX, e.clientY);
+      }
+    });
+
+    window.addEventListener("touchstart", (e) => {
+      if (e.touches && e.touches[0] && e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
+        spawnParticle(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+  </script>
+</body>
+</html>
