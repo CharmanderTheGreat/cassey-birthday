@@ -17,16 +17,16 @@ A responsive, single-page interactive web application built as a personalized bi
 - **Playback Controls**: Features Play/Pause, Next Track, Previous Track, track jump pills, dynamic time elapsed/duration counters, and a custom two-tone progress track slider.
 
 ### 3. Photo Gallery
-- **Curated Snapshots**: A 4-column responsive gallery card system displaying snapshots with custom track labels and descriptions[cite: 3].
-- **Responsive Layout**: Fluid CSS grid adapting from single-column mobile views to multi-column desktop displays[cite: 3].
+- **Curated Snapshots**: A 4-column responsive gallery card system displaying snapshots with custom track labels and descriptions.
+- **Responsive Layout**: Fluid CSS grid adapting from single-column mobile views to multi-column desktop displays.
 
 ### 4. Interactive Cake and Celebration
-- **Illustrated Cake**: Custom SVG illustration with animated flame effects[cite: 3].
-- **Candle Blowing Mechanic**: Allows the user to blow out the candle, which triggers an animated smoke visual and an on-screen confetti shower[cite: 3].
-- **Replayability**: Includes a relight button enabling the user to repeat the candle-blowing experience[cite: 3].
+- **Illustrated Cake**: Custom SVG illustration with animated flame effects.
+- **Candle Blowing Mechanic**: Allows the user to blow out the candle, which triggers an animated smoke visual and an on-screen confetti shower.
+- **Replayability**: Includes a relight button enabling the user to repeat the candle-blowing experience.
 
 ### 5. Ambient Tap Effects
-- **Touch and Click Feedback**: Generates dynamic drifting music and celebration symbols wherever the user taps or clicks across the viewport[cite: 3].
+- **Touch and Click Feedback**: Generates dynamic drifting music and celebration symbols wherever the user taps or clicks across the viewport.
 
 ---
 
@@ -56,9 +56,9 @@ A responsive, single-page interactive web application built as a personalized bi
 
 ## Tech Stack
 
-* **Markup**: HTML5[cite: 3]
-* **Styling**: Tailwind CSS (via CDN) and custom CSS3 animations[cite: 3]
-* **Typography**: Google Fonts (Cabinet Grotesk, Instrument Serif, Plus Jakarta Sans, Space Mono)[cite: 3]
-* **Icons**: FontAwesome 6[cite: 3]
-* **Confetti Engine**: Canvas Confetti[cite: 3]
-* **Cryptography**: Web Crypto API (PBKDF2, AES-GCM)[cite: 3]
+* **Markup**: HTML5
+* **Styling**: Tailwind CSS (via CDN) and custom CSS3 animations
+* **Typography**: Google Fonts (Cabinet Grotesk, Instrument Serif, Plus Jakarta Sans, Space Mono)
+* **Icons**: FontAwesome 6
+* **Confetti Engine**: Canvas Confetti
+* **Cryptography**: Web Crypto API (PBKDF2, AES-GCM)
