@@ -225,7 +225,7 @@
         </div>
 
         <p id="passError" class="text-xs text-rose-600 font-sans font-medium hidden">
-          Incorrect passkey. (Hint: all lowercase, no spaces!)
+          Incorrect passkey. Please try again.
         </p>
 
         <button
@@ -270,7 +270,7 @@
       </button>
     </header>
 
-    <!-- SECTION 1: HERO (BLANGKO BAGO MAG-DECRYPT) -->
+    <!-- SECTION 1: HERO -->
     <section class="w-full max-w-3xl mx-auto px-6 pt-6 pb-12 text-center">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indie-forest text-indie-canvas text-[11px] font-mono tracking-widest uppercase mb-6">
         <i class="fa-solid fa-compact-disc"></i> Side A &middot; Track 01
@@ -441,7 +441,6 @@
 
   <!-- JAVASCRIPT & CRYPTOGRAPHIC ENGINE -->
   <script>
-    // HARDCODED ENCRYPTED DATA (MULA SA ENCRYPTED_BUNDLE.JSON - ZERO EXTERNAL FETCH)
     const CIPHER_DATA = {
       salt: "hkFauqrM7Y5552B39cO0SQ==",
       iv: "mcvgpJm44FiZXEGd",
